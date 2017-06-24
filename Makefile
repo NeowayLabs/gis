@@ -4,7 +4,7 @@ all: test
 
 test: deps
 	cd _testdata/geodata && git pull origin master
-	go test -v ./...
+	./scripts/cover.sh
 
 deps: ./_testdata ./_testdata/geodata
 
