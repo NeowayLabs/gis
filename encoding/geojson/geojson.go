@@ -40,7 +40,7 @@ type (
 	}
 
 	MultiPoint struct {
-		coordinates []Position `json:"coordinates"`
+		Coordinates []Position `json:"coordinates"`
 		bbox        []Position `json:"bbox,omitempty"`
 	}
 
@@ -104,4 +104,5 @@ func (typs geojsonType) Valid(typ string) bool {
 	return false
 }
 
-func (p Point) Type() string { return "Point" }
+func (Point) Type() string      { return "Point" }
+func (MultiPoint) Type() string { return "MultiPoint" }

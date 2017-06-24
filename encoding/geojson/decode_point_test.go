@@ -72,3 +72,12 @@ func TestDecodeGeodataValidMultiPoints(t *testing.T) {
 		}
 	}
 }
+
+func TestDecodeGeodataInvalidMultiPoints(t *testing.T) {
+	for _, geojson := range getGeometries(t, "samples/multipoints/invalids") {
+		_, err := Decode([]byte(geojson))
+		if err == nil {
+			t.Fatalf("GeoJSON below is invalid...\n%s", geojson)
+		}
+	}
+}
