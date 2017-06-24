@@ -27,6 +27,6 @@ func assertPoint(t *testing.T, p1, p2 Object) {
 		t.Fatalf("Object (%#v) is not a point", p2)
 	}
 
-	coord1, coord2 := point1.Coordinate, point2.Coordinate
+	coord1, coord2 := point1.Coordinates, point2.Coordinates
 	assertPosition(t, coord1, coord2)
 }

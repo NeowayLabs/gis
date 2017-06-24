@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	// Position is the point coordinates in the
+	// Position is the point coordinates in WGS84
 	// geographic coordinate system.
 	// See: https://tools.ietf.org/html/rfc7946#section-3.1.1
 	Position struct {
@@ -15,15 +15,15 @@ type (
 	}
 
 	FeatureCollection struct {
-		Features []Feature
-		bbox     []Position
+		Features []Feature  `json:"features"`
+		bbox     []Position `json:"bbox,omitempty"`
 	}
 
 	Feature struct {
-		ID         *json.Number
-		properties interface{}
-		geometry   Geometry
-		bbox       []Position
+		ID         *json.Number `json:"id"`
+		properties interface{}  `json:"properties"`
+		geometry   Geometry     `json:"geometry"`
+		bbox       []Position   `json:"bbox,omitempty"`
 	}
 
 	Object interface {
@@ -35,22 +35,23 @@ type (
 	}
 
 	Point struct {
-		Coordinate Position
+		// Coordinates (sic) of the point
+		Coordinates Position `json:"coordinates"`
 	}
 
 	MultiPoint struct {
-		coordinates []Position
-		bbox        []Position
+		coordinates []Position `json:"coordinates"`
+		bbox        []Position `json:"bbox,omitempty"`
 	}
 
 	LineString struct {
 		coordinates []Position
-		bbox        []Position
+		bbox        []Position `json:"bbox,omitempty"`
 	}
 
 	MultiLineString struct {
 		coordinates [][]Position
-		bbox        []Position
+		bbox        []Position `json:"bbox,omitempty"`
 	}
 
 	// Polygon is comprised of linear rings (closed LinearString).
@@ -59,19 +60,19 @@ type (
 	// exterior ring).
 	// See: https://tools.ietf.org/html/rfc7946#section-3.1.6
 	Polygon struct {
-		coordinates [][]Position
-		bbox        []Position
+		Coordinates [][]Position `json:"coordinates"`
+		bbox        []Position   `json:"bbox,omitempty"`
 	}
 
 	// MultiPolygon is a list of polygons
 	MultiPolygon struct {
-		coordinates [][][]Position
-		bbox        []Position
+		coordinates [][][]Position `json:"coordinates"`
+		bbox        []Position     `json:"bbox,omitempty"`
 	}
 
 	GeometryCollection struct {
-		geometries []Geometry
-		bbox       []Position
+		geometries []Geometry `json:"geometries"`
+		bbox       []Position `json:"bbox,omitempty"`
 	}
 
 	geojsonType []string

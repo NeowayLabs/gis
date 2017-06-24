@@ -5,20 +5,38 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 )
 
+type Decoder struct {
+	content io.Reader
+	Strict  bool
+}
+
+func NewDecoder(r io.Reader) *Decoder {
+	return &Decoder{
+		content: r,
+		Strict:  true,
+	}
+}
+
 func Decode(data []byte) (Object, error) {
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.UseNumber()
+	d := NewDecoder(bytes.NewReader(data))
+	return d.Decode()
+}
+
+func (d *Decoder) Decode() (Object, error) {
+	jsonDecoder := json.NewDecoder(d.content)
+	jsonDecoder.UseNumber()
 	objmap := map[string]*json.RawMessage{}
-	err := decoder.Decode(&objmap)
+	err := jsonDecoder.Decode(&objmap)
 	if err != nil {
 		return nil, err
 	}
-	return decode(objmap)
+	return d.decode(objmap)
 }
 
-func decode(objmap map[string]*json.RawMessage) (Object, error) {
+func (d *Decoder) decode(objmap map[string]*json.RawMessage) (Object, error) {
 	typ, ok := objmap["type"]
 	if !ok || typ == nil {
 		return nil, errors.New("missing required 'type' member")
@@ -36,13 +54,13 @@ func decode(objmap map[string]*json.RawMessage) (Object, error) {
 
 	switch typstr {
 	case "Point":
-		return decodePoint(objmap)
+		return d.decodePoint(objmap)
 	}
 
 	return nil, nil
 }
 
-func decodePoint(objmap map[string]*json.RawMessage) (Object, error) {
+func (d *Decoder) decodePoint(objmap map[string]*json.RawMessage) (Object, error) {
 	coordinates, ok := objmap["coordinates"]
 	if !ok {
 		return nil, errors.New("missing required 'coordinates' member")
@@ -76,6 +94,15 @@ func decodePoint(objmap map[string]*json.RawMessage) (Object, error) {
 		}
 	}
 
+	if d.Strict {
+		if lon < -180.0 || lon > 180.0 {
+			return nil, fmt.Errorf("longitude must satisfy: -180.0 < lon < 180.0")
+		}
+		if lat < -90.0 || lat > 90.0 {
+			return nil, fmt.Errorf("latitude must satisfy: -90.0 < lat < 90.0")
+		}
+	}
+
 	pos := Position{
 		Lon: lon,
 		Lat: lat,
@@ -83,6 +110,6 @@ func decodePoint(objmap map[string]*json.RawMessage) (Object, error) {
 	}
 
 	return Point{
-		Coordinate: pos,
+		Coordinates: pos,
 	}, nil
 }
