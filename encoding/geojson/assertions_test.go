@@ -30,3 +30,26 @@ func assertPoint(t *testing.T, p1, p2 Object) {
 	coord1, coord2 := point1.Coordinates, point2.Coordinates
 	assertPosition(t, coord1, coord2)
 }
+
+func assertMPoint(t *testing.T, mp1, mp2 Object) {
+	assertObject(t, mp1, mp2)
+	mpoint1, ok := mp1.(MultiPoint)
+	mpoint2, ok2 := mp2.(MultiPoint)
+	if !ok {
+		t.Fatalf("Object (%#v) is not a MultiPoint", mp1)
+	}
+	if !ok2 {
+		t.Fatalf("Object (%#v) is not a MultiPoint", mp2)
+	}
+	coords1, coords2 := mpoint1.Coordinates, mpoint2.Coordinates
+	if len(coords1) != len(coords2) {
+		t.Fatalf("number of coordinates mismatch: %d != %d",
+			len(coords1), len(coords2))
+	}
+
+	for i := 0; i < len(coords1); i++ {
+		coord1 := coords1[i]
+		coord2 := coords2[i]
+		assertPosition(t, coord1, coord2)
+	}
+}

@@ -150,7 +150,7 @@ func (d *Decoder) decodeMPoint(objmap map[string]*json.RawMessage) (Object, erro
 	if d.Strict && len(coords) == 0 {
 		return nil, fmt.Errorf("MultiPoint has no point")
 	}
-	return &MultiPoint{
+	return MultiPoint{
 		Coordinates: coords,
 	}, nil
 }

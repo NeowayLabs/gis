@@ -11,6 +11,14 @@ func testSinglePointsOK(t *testing.T, geojson string, expected Point) {
 	assertPoint(t, obj, expected)
 }
 
+func testSingleMPointsOK(t *testing.T, geojson string, expected MultiPoint) {
+	obj, err := Decode([]byte(geojson))
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertMPoint(t, obj, expected)
+}
+
 func TestDecodePointOK(t *testing.T) {
 	for _, tc := range []struct {
 		geojson string
@@ -43,6 +51,33 @@ func TestDecodePointOK(t *testing.T) {
 	} {
 		tc := tc
 		testSinglePointsOK(t, tc.geojson, tc.point)
+	}
+}
+
+func TestDecodeMultiPoint(t *testing.T) {
+	for _, tc := range []struct {
+		geojson string
+		mpoint  MultiPoint
+	}{
+		{
+			geojson: `{
+			"type": "MultiPoint",
+			"coordinates": [
+				[10, 20]
+			]
+		}`,
+			mpoint: MultiPoint{
+				Coordinates: []Position{
+					{
+						Lat: 20,
+						Lon: 10,
+					},
+				},
+			},
+		},
+	} {
+		tc := tc
+		testSingleMPointsOK(t, tc.geojson, tc.mpoint)
 	}
 }
 
