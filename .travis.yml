@@ -5,3 +5,6 @@ go:
   - 1.8
   - 1.7
   - master
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
