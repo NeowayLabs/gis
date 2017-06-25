@@ -150,6 +150,8 @@ func TestSphereMarsDistance(t *testing.T) {
 			dst:     NewSPoint(113.30, 2.80),
 			// Distance calculated here, but not reliable either:
 			// http://answers.google.com/answers/threadview/id/443926.html
+			// Other source:
+			// http://spacemath.github.io/mars-distance/
 			expected: 5719015.85,
 		},
 	} {
