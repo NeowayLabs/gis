@@ -1,3 +1,4 @@
+[![codecov](https://codecov.io/gh/NeowayLabs/gis/branch/master/graph/badge.svg)](https://codecov.io/gh/NeowayLabs/gis)
 # GeoJSON encoding
 
 GeoJSON encoder/decoder based in the
