@@ -27,7 +27,7 @@ type (
 
 const (
 	EarthRadius = 6378100 // Earth radius at equator in meters
-	MarsRadius  = 3396200 // Mars radius at equator in meters
+	MarsRadius  = 3390000 // Mars radius at equator in meters
 )
 
 var (

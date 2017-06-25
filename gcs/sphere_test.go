@@ -76,7 +76,7 @@ func TestSphereContains(t *testing.T) {
 	}
 }
 
-func TestSphereDistance(t *testing.T) {
+func TestSphereEarthDistance(t *testing.T) {
 	for _, tc := range []struct {
 		srcName  string
 		dstName  string
@@ -126,6 +126,38 @@ func TestSphereDistance(t *testing.T) {
 			tc.srcName, tc.dstName)
 		t.Run(desc, func(t *testing.T) {
 			d := SphericalEarth.Distance(tc.src, tc.dst)
+			if !floatEquals(d, tc.expected, 0.01) {
+				t.Fatalf("Distance off by %.12f. Expected %.12f but got %.12f",
+					math.Abs(d-tc.expected), tc.expected, d)
+			}
+		})
+	}
+
+}
+
+func TestSphereMarsDistance(t *testing.T) {
+	for _, tc := range []struct {
+		srcName  string
+		dstName  string
+		src      SPoint
+		dst      SPoint
+		expected float64
+	}{
+		{
+			srcName: "Cydonia mensae",
+			dstName: "Tharsis Montes",
+			src:     NewSPoint(12.80, 37.00),
+			dst:     NewSPoint(113.30, 2.80),
+			// Distance calculated here, but not reliable either:
+			// http://answers.google.com/answers/threadview/id/443926.html
+			expected: 5719015.85,
+		},
+	} {
+		tc := tc
+		desc := fmt.Sprintf("Distance from %s to %s",
+			tc.srcName, tc.dstName)
+		t.Run(desc, func(t *testing.T) {
+			d := SphericalMars.Distance(tc.src, tc.dst)
 			if !floatEquals(d, tc.expected, 0.01) {
 				t.Fatalf("Distance off by %.12f. Expected %.12f but got %.12f",
 					math.Abs(d-tc.expected), tc.expected, d)
