@@ -75,3 +75,62 @@ func TestSphereContains(t *testing.T) {
 
 	}
 }
+
+func TestSphereDistance(t *testing.T) {
+	for _, tc := range []struct {
+		srcName  string
+		dstName  string
+		src      SPoint
+		dst      SPoint
+		expected float64
+	}{
+		{
+			srcName:  "Florianópolis",
+			dstName:  "São Paulo",
+			src:      NewSPoint(-48.5482, -27.5949),
+			dst:      NewSPoint(-46.6333, -23.5505),
+			expected: 489532.64,
+		},
+		{
+			srcName:  "Origin",
+			dstName:  "Antipodal -180.0",
+			src:      NewSPoint(0, 0),
+			dst:      NewSPoint(-180, 0),
+			expected: math.Pi * SphericalEarth.R, // 2πr/2
+		},
+		{
+			srcName:  "Origin",
+			dstName:  "Antipodal +180.0",
+			src:      NewSPoint(0, 0),
+			dst:      NewSPoint(180, 0),
+			expected: math.Pi * SphericalEarth.R, // 2πr/2
+		},
+		{
+			srcName:  "antipodal -180.0",
+			dstName:  "antipodal +180.0",
+			src:      NewSPoint(-180.0, 0),
+			dst:      NewSPoint(180.0, 0),
+			expected: 0, // -180.0 and +180.0 is the same longitude
+		},
+		{
+			srcName: "arbitrary p1",
+			dstName: "arbitrary p2",
+			src:     NewSPoint(-100.0, 32.0),
+			dst:     NewSPoint(40.0, -27.0),
+			// online calculated at http://www.movable-type.co.uk/scripts/latlong.html
+			expected: 16144146.90,
+		},
+	} {
+		tc := tc
+		desc := fmt.Sprintf("Distance from %s to %s",
+			tc.srcName, tc.dstName)
+		t.Run(desc, func(t *testing.T) {
+			d := SphericalEarth.Distance(tc.src, tc.dst)
+			if !floatEquals(d, tc.expected, 0.01) {
+				t.Fatalf("Distance off by %.12f. Expected %.12f but got %.12f",
+					math.Abs(d-tc.expected), tc.expected, d)
+			}
+		})
+	}
+
+}

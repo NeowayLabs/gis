@@ -6,7 +6,7 @@ type (
 	Angle float64 // Angle in radians
 )
 
-func radians(angle float64) Angle {
+func toRadians(angle float64) Angle {
 	return Angle(angle * math.Pi / 180)
 }
 

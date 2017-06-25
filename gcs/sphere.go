@@ -51,8 +51,8 @@ var (
 // Lon and lat are in degrees.
 func NewSPoint(lon, lat float64) SPoint {
 	return SPoint{
-		λ: radians(lon),
-		φ: radians(lat),
+		λ: toRadians(lon),
+		φ: toRadians(lat),
 	}
 }
 
@@ -65,6 +65,31 @@ func (s *Sphere) Contains(p Point) bool {
 	return p.R <= s.R
 }
 
-// func (s *Sphere) Distance(p1, p2 Point) float64 {
+// Distance of p1 and p2 throught the surface of the sphere (orthodromic
+// distance or great circle) returned in meters.
+// The algorithm uses the haversine formula and because of that it has
+// lower precision for computing distance of antipodal points.
+func (s *Sphere) Distance(p1, p2 SPoint) float64 {
+	return haversin(s.R, p1, p2)
+}
 
-// }
+// haversin function of angle θ
+//   hsin(θ) = sin²(θ/2)
+func hsin(θ float64) float64 {
+	return math.Pow(math.Sin(θ/2), 2)
+}
+
+// haversin of α angle between points p1 and p2.
+// The formula is:
+//   haversin(α) = hsin(φ2-φ1)+cosφ1.cosφ2.hsin(λ1-λ2)
+//   haversin(α) = (d/2R)²
+// then:
+//   d = 2Rsin⁻¹√(haversin(α))
+// Based on:
+//   https://www.math.ksu.edu/~dbski/writings/haversine.pdf
+func haversin(R float64, p1, p2 SPoint) float64 {
+	φ1, λ1 := float64(p1.φ), float64(p1.λ)
+	φ2, λ2 := float64(p2.φ), float64(p2.λ)
+	h := hsin(φ2-φ1) + math.Cos(φ1)*math.Cos(φ2)*hsin(λ2-λ1)
+	return 2 * R * math.Asin(math.Sqrt(h))
+}
