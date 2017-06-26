@@ -73,6 +73,17 @@ func (s *Sphere) Distance(p1, p2 SPoint) float64 {
 	return haversin(s.R, p1, p2)
 }
 
+// Ortho projects the longitude λ and latitude φ onto a secant plane
+// (Orthographic projection). It returns the plane's cartesian points X and Y.
+func (s *Sphere) Ortho(origin, p SPoint) (float64, float64) {
+	R := s.R
+	φ, λ := p.φ.Degrees(), p.λ.Degrees()
+	φ0, λ0 := origin.φ.Degrees(), origin.λ.Degrees()
+	x := R * math.Cos(φ) * math.Sin(λ-λ0)
+	y := R * (math.Cos(φ0)*math.Sin(φ) - math.Sin(φ0)*math.Cos(φ)*math.Cos(λ-λ0))
+	return x, y
+}
+
 // haversin function of angle θ
 //   hsin(θ) = sin²(θ/2)
 func hsin(θ float64) float64 {

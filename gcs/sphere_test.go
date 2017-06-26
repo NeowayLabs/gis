@@ -20,6 +20,11 @@ type (
 	}
 )
 
+var (
+	florianopolis = NewSPoint(-48.5482, -27.5949)
+	saopaulo      = NewSPoint(-46.6333, -23.5505)
+)
+
 func testSphereArea(t *testing.T, testcase ttSphereArea) {
 	sp := Sphere{
 		R: testcase.r,
@@ -87,8 +92,8 @@ func TestSphereEarthDistance(t *testing.T) {
 		{
 			srcName:  "Florianópolis",
 			dstName:  "São Paulo",
-			src:      NewSPoint(-48.5482, -27.5949),
-			dst:      NewSPoint(-46.6333, -23.5505),
+			src:      florianopolis,
+			dst:      saopaulo,
 			expected: 489532.64,
 		},
 		{
@@ -167,4 +172,14 @@ func TestSphereMarsDistance(t *testing.T) {
 		})
 	}
 
+}
+
+func TestSphereOrthoProjection(t *testing.T) {
+	origin := NewSPoint(90, 0)
+	x, y := SphericalEarth.Ortho(origin, NewSPoint(-170, 0))
+	fmt.Printf("%f, %f\n", x, y)
+	x, y = SphericalEarth.Ortho(origin, florianopolis)
+	fmt.Printf("%f, %f\n", x, y)
+	x, y = SphericalEarth.Ortho(origin, saopaulo)
+	fmt.Printf("%f, %f\n", x, y)
 }
