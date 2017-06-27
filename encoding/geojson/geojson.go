@@ -45,7 +45,7 @@ type (
 	}
 
 	LineString struct {
-		coordinates []Position
+		Coordinates []Position
 		bbox        []Position `json:"bbox,omitempty"`
 	}
 
@@ -106,3 +106,4 @@ func (typs geojsonType) Valid(typ string) bool {
 
 func (Point) Type() string      { return "Point" }
 func (MultiPoint) Type() string { return "MultiPoint" }
+func (LineString) Type() string { return "LineString" }

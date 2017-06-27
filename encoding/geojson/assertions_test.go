@@ -53,3 +53,26 @@ func assertMPoint(t *testing.T, mp1, mp2 Object) {
 		assertPosition(t, coord1, coord2)
 	}
 }
+
+func assertLineString(t *testing.T, o1, o2 Object) {
+	assertObject(t, o1, o2)
+	l1, ok1 := o1.(LineString)
+	l2, ok2 := o2.(LineString)
+	if !ok1 {
+		t.Fatalf("Object (%#v) is not a LineString", o1)
+	}
+	if !ok2 {
+		t.Fatalf("Object (%#v) is not a MultiPoint", o2)
+	}
+	coords1, coords2 := l1.Coordinates, l2.Coordinates
+	if len(coords1) != len(coords2) {
+		t.Fatalf("number of coordinates mismatch: %d != %d\n%#v",
+			len(coords1), len(coords2), l1)
+	}
+
+	for i := 0; i < len(coords1); i++ {
+		coord1 := coords1[i]
+		coord2 := coords2[i]
+		assertPosition(t, coord1, coord2)
+	}
+}

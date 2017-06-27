@@ -57,6 +57,8 @@ func (d *Decoder) decode(objmap map[string]*json.RawMessage) (Object, error) {
 		return d.decodePoint(objmap)
 	case "MultiPoint":
 		return d.decodeMPoint(objmap)
+	case "LineString":
+		return d.decodeLineString(objmap)
 	}
 
 	panic("unreachable")
@@ -126,6 +128,18 @@ func (d *Decoder) decodePoint(objmap map[string]*json.RawMessage) (Object, error
 	}, nil
 }
 
+func (d *Decoder) decodePositionList(coordNumbers [][]json.Number) ([]Position, error) {
+	var coords []Position
+	for _, coord := range coordNumbers {
+		pos, err := d.decodeCoordinates(coord)
+		if err != nil {
+			return nil, err
+		}
+		coords = append(coords, pos)
+	}
+	return coords, nil
+}
+
 func (d *Decoder) decodeMPoint(objmap map[string]*json.RawMessage) (Object, error) {
 	coordinates, ok := objmap["coordinates"]
 	if !ok {
@@ -138,19 +152,38 @@ func (d *Decoder) decodeMPoint(objmap map[string]*json.RawMessage) (Object, erro
 		return nil, err
 	}
 
-	var coords []Position
-	for _, coord := range coordNumbers {
-		pos, err := d.decodeCoordinates(coord)
-		if err != nil {
-			return nil, err
-		}
-		coords = append(coords, pos)
+	coords, err := d.decodePositionList(coordNumbers)
+	if err != nil {
+		return nil, err
 	}
 
 	if d.Strict && len(coords) == 0 {
 		return nil, fmt.Errorf("MultiPoint has no point")
 	}
 	return MultiPoint{
+		Coordinates: coords,
+	}, nil
+}
+
+func (d *Decoder) decodeLineString(objmap map[string]*json.RawMessage) (Object, error) {
+	coordinates, ok := objmap["coordinates"]
+	if !ok {
+		return nil, errors.New("missing required 'coordinates' member")
+	}
+
+	var coordNumbers [][]json.Number
+	err := json.Unmarshal(*coordinates, &coordNumbers)
+	if err != nil {
+		return nil, err
+	}
+	coords, err := d.decodePositionList(coordNumbers)
+	if err != nil {
+		return nil, err
+	}
+	if len(coords) < 2 {
+		return nil, fmt.Errorf("LineString requires two or more points")
+	}
+	return LineString{
 		Coordinates: coords,
 	}, nil
 }
