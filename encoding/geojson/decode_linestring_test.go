@@ -127,3 +127,21 @@ func TestLineStringOK(t *testing.T) {
 		testLineStringOK(t, tc.geojson, tc.line)
 	}
 }
+
+func TestDecodeGeodataValidLineStrings(t *testing.T) {
+	for _, geojson := range getGeometries(t, "samples/linestring/valids") {
+		_, err := Decode([]byte(geojson))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+func TestDecodeGeodataInvalidLineStrings(t *testing.T) {
+	for _, geojson := range getGeometries(t, "samples/linestring/invalids") {
+		_, err := Decode([]byte(geojson))
+		if err == nil {
+			t.Fatalf("GeoJSON below is invalid...\n%s", geojson)
+		}
+	}
+}
