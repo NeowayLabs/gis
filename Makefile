@@ -3,7 +3,7 @@
 all: test
 
 test: deps
-	cd _testdata/geodata && git pull origin master
+	cd _testdata/geodata && git pull origin master && git-lfs pull
 	./scripts/cover.sh
 
 deps: ./_testdata ./_testdata/geodata
