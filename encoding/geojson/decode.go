@@ -8,16 +8,28 @@ import (
 	"io"
 )
 
-type Decoder struct {
-	content io.Reader
-	Strict  bool
-}
+type (
+	decoderFunc func(map[string]*json.RawMessage) (Object, error)
+	Decoder     struct {
+		content io.Reader
+		Strict  bool
+
+		decoders map[string]decoderFunc
+	}
+)
 
 func NewDecoder(r io.Reader) *Decoder {
-	return &Decoder{
+	d := &Decoder{
 		content: r,
 		Strict:  true,
 	}
+	d.decoders = map[string]decoderFunc{
+		"Point":      d.decodePoint,
+		"MultiPoint": d.decodeMPoint,
+		"LineString": d.decodeLineString,
+		//		"MultiLineString": decodeMultiLineString,
+	}
+	return d
 }
 
 func Decode(data []byte) (Object, error) {
@@ -48,22 +60,12 @@ func (d *Decoder) decode(objmap map[string]*json.RawMessage) (Object, error) {
 		return nil, err
 	}
 
-	if !geojsonTypes.Valid(typstr) {
+	decoder, ok := d.decoders[typstr]
+	if !ok {
 		return nil, fmt.Errorf("invalid geojson object: %s", typstr)
 	}
 
-	switch typstr {
-	case "Point":
-		return d.decodePoint(objmap)
-	case "MultiPoint":
-		return d.decodeMPoint(objmap)
-	case "LineString":
-		return d.decodeLineString(objmap)
-	}
-
-	panic("unreachable")
-
-	return nil, nil
+	return decoder(objmap)
 }
 
 func (d *Decoder) decodeCoordinates(coords []json.Number) (Position, error) {

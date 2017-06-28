@@ -5,7 +5,7 @@ import "testing"
 func testLineStringOK(t *testing.T, geojson string, expected LineString) {
 	obj, err := Decode([]byte(geojson))
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("Parsing: %s\nerror: %s", geojson, err)
 	}
 
 	assertLineString(t, obj, expected)
@@ -132,7 +132,7 @@ func TestDecodeGeodataValidLineStrings(t *testing.T) {
 	for _, geojson := range getGeometries(t, "samples/linestring/valids") {
 		_, err := Decode([]byte(geojson))
 		if err != nil {
-			t.Fatal(err)
+			t.Fatalf("Parsing: %s\nerror: %s", geojson, err)
 		}
 	}
 }
