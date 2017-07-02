@@ -1,3 +1,8 @@
+// Program used to generated the csv test file.
+// It queries the server of geohash.org for valid
+// geohashes and print longitude, latitude and hash
+// to stdout.
+// Usage: go run gen.go > geohash.csv
 package main
 
 import (

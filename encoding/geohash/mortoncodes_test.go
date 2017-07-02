@@ -67,9 +67,3 @@ func TestMortonInterleaves(t *testing.T) {
 		}
 	}
 }
-
-func TestMortonGenerateTables(t *testing.T) {
-	for i := 0; i < 256; i++ {
-
-	}
-}
