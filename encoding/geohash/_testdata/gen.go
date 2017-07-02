@@ -1,4 +1,4 @@
-// Program used to generated the csv test file.
+// Program/script used to generated the csv test file.
 // It queries the server of geohash.org for valid
 // geohashes and print longitude, latitude and hash
 // to stdout.
