@@ -1,30 +1,67 @@
 package geohash
 
 import (
-	"encoding/base32"
 	"math"
 )
 
-const alphabet = "0123456789bcdefghjkmnpqrstuvwxyz"
+const base32 = "0123456789bcdefghjkmnpqrstuvwxyz"
 
-func Encode(lon, lat float64, precision int) string {
-	bits := uint(5 * precision)
-	x, y := bisect(lon, 180), bisect(lat, 90)
-	hashint := interleave(y, x)
-	hashint >>= (64 - bits)
-	src := []byte{
-		byte(hashint >> 24),
-		byte((hashint >> 16) & 0xFF),
-		byte((hashint >> 8) & 0xFF),
-		byte(hashint & 0xFF),
+var base32rev ['z' + 1]byte
+
+func init() {
+	for i := 0; i < len(base32); i++ {
+		base32rev[int(base32[i])] = byte(i)
 	}
-	var dst [8]byte
-	enc := base32.NewEncoding(alphabet)
-	enc.Encode(dst[:], src)
-	return string(dst[:])
 }
 
-func bisect(angle, r float64) uint32 {
-	v := (angle + r) / 2 * r
-	return uint32(v * math.Exp2(32))
+func Encode(lon, lat float64, precision uint) string {
+	bits := uint(5 * precision)
+	alon, alat := adjust(lon, 180), adjust(lat, 90)
+	code := encode(alon, alat, bits)
+	return tobase32(code)[12-precision:]
+}
+
+func encode(lonInt, latInt uint32, bits uint) uint64 {
+	code := interleave(latInt, lonInt)
+	code >>= (64 - bits)
+	return code
+}
+
+func adjust(angle, r float64) uint32 {
+	p := (angle + r) / (2 * r)
+	return uint32(p * math.Exp2(32))
+}
+
+func tobase32(code uint64) string {
+	var b [12]byte
+
+	// loop unrolling
+	// Start by last position to skip bounds checking in next
+	// assignments in b. Take a look in "Bounds Checking Elimination"
+	// or BCE in Go >= 1.7
+
+	b[11] = base32[code&0x1f]
+	code >>= 5
+	b[10] = base32[code&0x1f]
+	code >>= 5
+	b[9] = base32[code&0x1f]
+	code >>= 5
+	b[8] = base32[code&0x1f]
+	code >>= 5
+	b[7] = base32[code&0x1f]
+	code >>= 5
+	b[6] = base32[code&0x1f]
+	code >>= 5
+	b[5] = base32[code&0x1f]
+	code >>= 5
+	b[4] = base32[code&0x1f]
+	code >>= 5
+	b[3] = base32[code&0x1f]
+	code >>= 5
+	b[2] = base32[code&0x1f]
+	code >>= 5
+	b[1] = base32[code&0x1f]
+	code >>= 5
+	b[0] = base32[code&0x1f]
+	return string(b[:])
 }
