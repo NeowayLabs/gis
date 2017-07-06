@@ -5,11 +5,11 @@ const (
 	maxint32 = 1 << 32
 )
 
-var base32rev ['z' + 1]byte
+var base32rev ['z' + 1]uint64
 
 func init() {
 	for i := 0; i < len(base32); i++ {
-		base32rev[int(base32[i])] = byte(i)
+		base32rev[int(base32[i])] = uint64(i)
 	}
 }
 
@@ -25,9 +25,30 @@ func encode(lonInt, latInt uint32, bits uint) uint64 {
 	return code >> (64 - bits)
 }
 
+func Decode(hashstr string) (lon, lat float64) {
+	bits := uint(5 * len(hashstr))
+	hashint := toint(hashstr)
+	hashint <<= (64 - bits)
+	alat, alon := deinterleave(hashint)
+	return deadjust(alon, 180), deadjust(alat, 90)
+}
+
 func adjust(angle, r float64) uint32 {
 	p := (angle + r) / (2 * r)
 	return uint32(p * maxint32)
+}
+
+func deadjust(x uint32, r float64) float64 {
+	p := float64(x) / maxint32
+	return 2*p*r - r
+}
+
+func toint(hashstr string) (code uint64) {
+	hash := []byte(hashstr)
+	for i := 0; i < len(hash); i++ {
+		code = (code << 5) | base32rev[hash[i]]&0x1f
+	}
+	return code
 }
 
 func tobase32(code uint64) string {

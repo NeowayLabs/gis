@@ -73,6 +73,18 @@ func BenchmarkEncode(b *testing.B) {
 	}
 }
 
+func BenchmarkEncodeFixedPoint(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Encode(-48, -27, 12)
+	}
+}
+
+func BenchmarkDecode(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Decode("d9ez4jg6pmp4")
+	}
+}
+
 func testEncode(t *testing.T, lon, lat float64, expected string) {
 	got := Encode(lon, lat, 12)
 	if !strings.HasPrefix(got, expected) {
@@ -131,4 +143,14 @@ func TestEncodeFromCSV(t *testing.T) {
 
 	elapsed := time.Since(startTime)
 	t.Logf("%d geohashes processed in %s", len(tcases), elapsed)
+}
+
+func TestDecode(t *testing.T) {
+	lon, lat := -62.133888, 9.699925
+	hash := Encode(lon, lat, 12)
+	lon2, lat2 := Decode(hash)
+	t.Logf(`Decode("%s") == %f, %f`, hash, lon2, lat2)
+	hash = hash[0 : len(hash)-1]
+	lon2, lat2 = Decode(hash)
+	t.Logf(`Decode("%s") == %f, %f`, hash, lon2, lat2)
 }
