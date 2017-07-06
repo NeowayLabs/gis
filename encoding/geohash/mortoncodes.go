@@ -27,6 +27,7 @@ func interleave(x, y uint32) uint64 {
 	return stripe(x) | (stripe(y) << 1)
 }
 
+// deinterleave z-code in x and y.
 func deinterleave(code uint64) (x, y uint32) {
 	return shrink(code), shrink(code >> 1)
 }
