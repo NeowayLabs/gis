@@ -1,10 +1,9 @@
 package geohash
 
-import (
-	"math"
+const (
+	base32   = "0123456789bcdefghjkmnpqrstuvwxyz"
+	maxint32 = 1 << 32
 )
-
-const base32 = "0123456789bcdefghjkmnpqrstuvwxyz"
 
 var base32rev ['z' + 1]byte
 
@@ -23,13 +22,12 @@ func Encode(lon, lat float64, precision uint) string {
 
 func encode(lonInt, latInt uint32, bits uint) uint64 {
 	code := interleave(latInt, lonInt)
-	code >>= (64 - bits)
-	return code
+	return code >> (64 - bits)
 }
 
 func adjust(angle, r float64) uint32 {
 	p := (angle + r) / (2 * r)
-	return uint32(p * math.Exp2(32))
+	return uint32(p * maxint32)
 }
 
 func tobase32(code uint64) string {
