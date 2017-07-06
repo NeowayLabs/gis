@@ -44,9 +44,8 @@ func deadjust(x uint32, r float64) float64 {
 }
 
 func toint(hashstr string) (code uint64) {
-	hash := []byte(hashstr)
-	for i := 0; i < len(hash); i++ {
-		code = (code << 5) | base32rev[hash[i]]&0x1f
+	for i := 0; i < len(hashstr); i++ {
+		code = (code << 5) | base32rev[byte(hashstr[i])]&0x1f
 	}
 	return code
 }
