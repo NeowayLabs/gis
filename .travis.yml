@@ -1,11 +1,12 @@
 language: go
 
-
 env:
   - PATH=$PATH:/tmp/git-lfs
 
 go:
-  - 1.x
+  - tip
+  - 1.10
+  - 1.9
   - 1.8
   - 1.7
   - master
@@ -14,3 +15,4 @@ install:
   - mkdir -p /tmp/git-lfs && curl -L https://github.com/github/git-lfs/releases/download/v2.1.1/git-lfs-$([ "$TRAVIS_OS_NAME" == "linux" ] && echo "linux" || echo "darwin")-amd64-2.1.1.tar.gz | tar -xz -C /tmp/git-lfs --strip-components 1
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
